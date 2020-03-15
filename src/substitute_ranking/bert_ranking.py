@@ -17,9 +17,13 @@ def format_attention(attention):
     # num_layers x num_heads x seq_len x seq_len
     return torch.stack(squeezed)
 
-def self_attention_averages(attention, tokens, sub_token):
+def average(list_avg):
+    return sum(list_avg)/len(list_avg)
+
+def self_attention_averages(attention, tokens, sub_tokens):
     attn = format_attention(attention)
-    attn_for_embedding = [attn[:, :, sub_token, j].mean() for j in range(0, len(tokens))]
+    attn_for_embedding = [average([attn[:, :, sub_token, j].mean() for sub_token in range(sub_tokens[0], sub_tokens[1])]) for j in range(0, len(tokens))]
+    attn_for_embedding[sub_tokens[0]:sub_tokens[1]] = [average(attn_for_embedding[sub_tokens[0]:sub_tokens[1]])]
     return attn_for_embedding
 
 def stats(input_sentence, target_word, attention_needed):
@@ -32,8 +36,8 @@ def stats(input_sentence, target_word, attention_needed):
     tokens = tokenizer.convert_ids_to_tokens(input_id_list)
     range_of_target = util.find_sublist(token_subset, tokens)
     if attention_needed:
-        sub_token = tokens.index(target_word)
-        return util.replace_with_average(embeddings[0], range_of_target), self_attention_averages(attention, tokens, sub_token)
+        sub_tokens = util.find_sublist(token_subset, tokens)
+        return util.replace_with_average(embeddings[0], range_of_target), self_attention_averages(attention, tokens, sub_tokens)
     else:
         return util.replace_with_average(embeddings[0], range_of_target), None
 
