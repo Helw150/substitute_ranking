@@ -5,7 +5,7 @@ import torch
 from torch import nn
 
 
-model_version = 'bert-base-uncased'
+model_version = 'bert-large-cased-whole-word-masking'
 do_lower_case = True
 model = BertModel.from_pretrained(model_version, output_attentions=True)
 tokenizer = BertTokenizer.from_pretrained(model_version, do_lower_case=do_lower_case)
