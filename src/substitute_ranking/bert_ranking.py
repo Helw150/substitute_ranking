@@ -30,7 +30,7 @@ def self_attention_averages(attention, tokens, sub_tokens):
 
 def stats(input_sentence, target_word, attention_needed):
     token_subset = util.tokenize_word(target_word, tokenizer)
-    inputs = tokenizer.encode_plus(input_sentence, return_tensors='pt', add_special_tokens=True)
+    inputs = tokenizer.encode_plus(input_sentence, return_tensors='pt', add_special_tokens=False)
     token_type_ids = inputs['token_type_ids']
     input_ids = inputs['input_ids']
     embeddings, _, attention = model(input_ids, token_type_ids=token_type_ids)
