@@ -3,7 +3,7 @@ from version import Version
 
 
 setup(name='substitute_ranking',
-                 version=Version('0.0.1').number,
+                 version=Version('0.0.2').number,
                  description='Lexical Substitution Ranking Package',
                  long_description=open('README.md').read().strip(),
                  author='William Held',
