@@ -55,5 +55,5 @@ def score_substitution(input_sentence, original_word, substitution_word):
     new_embeddings = substitution_stats(substitution_sentence, substitution_word)
     assert(len(original_embeddings) == len(attention))
     assert(len(original_embeddings) == len(new_embeddings))
-    return sum([score_token(original_embeddings[i], new_embeddings[i], attention[i]) for i in range(0, len(original_embeddings))])[0]
+    return sum([score_token(original_embeddings[i], new_embeddings[i], attention[i]) for i in range(0, len(original_embeddings))]).item()
     
