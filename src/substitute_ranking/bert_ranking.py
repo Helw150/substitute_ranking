@@ -1,7 +1,9 @@
+import re
+import substitute_ranking.util as util
 from transformers import BertTokenizer, BertModel
 import torch
 from torch import nn
-import substitute_ranking.util as util
+
 
 model_version = 'bert-base-uncased'
 do_lower_case = True
@@ -17,13 +19,13 @@ def format_attention(attention):
     # num_layers x num_heads x seq_len x seq_len
     return torch.stack(squeezed)
 
-def average(list_avg):
-    return sum(list_avg)/len(list_avg)
-
 def self_attention_averages(attention, tokens, sub_tokens):
     attn = format_attention(attention)
-    attn_for_embedding = [average([attn[:, :, sub_token, j].mean() for sub_token in range(sub_tokens[0], sub_tokens[1])]) for j in range(0, len(tokens))]
-    attn_for_embedding[sub_tokens[0]:sub_tokens[1]] = [average(attn_for_embedding[sub_tokens[0]:sub_tokens[1]])]
+    attn_for_embedding = [sum([attn[:, :, sub_token, j].mean() for sub_token in range(sub_tokens[0], sub_tokens[1])]) for j in range(0, len(tokens))]
+    attn_for_embedding[sub_tokens[0]:sub_tokens[1]] = [util.average(attn_for_embedding[sub_tokens[0]:sub_tokens[1]])]
+    total_attn = sum(attn_for_embedding)
+    attn_for_embedding = [attn/total_attn for attn in attn_for_embedding]
+    assert(sum(attn_for_embedding) == 1), (sum(attn_for_embedding), total_attn)
     return attn_for_embedding
 
 def stats(input_sentence, target_word, attention_needed):
@@ -48,7 +50,7 @@ def score_token(original_embedding, new_embedding, attention):
     
 
 def score_substitution(input_sentence, original_word, substitution_word):
-    substitution_sentence = input_sentence.replace(original_word, substitution_word, 1)
+    substitution_sentence = re.sub(r"\b" + re.escape(original_word) + r"\b", substitution_word, input_sentence, count = 1)
     original_embeddings, attention = stats(input_sentence, original_word, True)
     new_embeddings, _ = stats(substitution_sentence, substitution_word, False)
     assert(len(original_embeddings) == len(attention)), (len(original_embeddings), len(attention))

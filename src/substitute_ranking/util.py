@@ -16,6 +16,9 @@ def find_sublist(sub, bigger):
     except ValueError:
         return -1
 
+def average(list_avg):
+    return sum(list_avg)/len(list_avg)
+
 def replace_with_average(vectors, range_to_average):
     vector_to_average = vectors[range_to_average[0]: range_to_average[1]]
     averaged_vector = vectors.mean(0).unsqueeze(0)
