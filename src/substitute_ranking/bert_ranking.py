@@ -39,9 +39,9 @@ def stats(input_sentence, target_word, attention_needed):
     range_of_target = util.find_sublist(token_subset, tokens)
     if attention_needed:
         sub_tokens = util.find_sublist(token_subset, tokens)
-        return util.replace_with_average(embeddings[0], range_of_target), self_attention_averages(attention, tokens, sub_tokens)
+        return util.replace_with_average(embeddings[-1], range_of_target), self_attention_averages(attention, tokens, sub_tokens)
     else:
-        return util.replace_with_average(embeddings[0], range_of_target), None
+        return util.replace_with_average(embeddings[-1], range_of_target), None
 
 
 
