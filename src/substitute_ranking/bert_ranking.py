@@ -25,7 +25,7 @@ def self_attention_averages(attention, tokens, sub_tokens):
     attn_for_embedding[sub_tokens[0]:sub_tokens[1]] = [util.average(attn_for_embedding[sub_tokens[0]:sub_tokens[1]])]
     total_attn = sum(attn_for_embedding)
     attn_for_embedding = [attn/total_attn for attn in attn_for_embedding]
-    assert(sum(attn_for_embedding).item() == 1), (sum(attn_for_embedding), total_attn)
+    assert(abs(sum(attn_for_embedding).item() - 1) < 0.01), (sum(attn_for_embedding), total_attn)
     return attn_for_embedding
 
 def stats(input_sentence, target_word, attention_needed):
