@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 model_version = "bert-base-uncased"
 do_lower_case = True
-model = BertModel.from_pretrained(model_version, output_attentions=True).eval()
+model = BertModel.from_pretrained(model_version, output_attentions=True).eval().cuda()
 tokenizer = BertTokenizer.from_pretrained(model_version, do_lower_case=do_lower_case)
 cos = nn.CosineSimilarity(dim=0, eps=1e-6)
 
@@ -44,13 +44,13 @@ def train(
         ]
         for new_embeddings in new_embeddings_seq:
             training_data.append(
-                (original_embeddings, new_embeddings, attention, label)
+                (original_embeddings.cuda(), new_embeddings.cuda(), attention.cuda(), label)
             )
 
     epochs = n_iters / (len(training_data) / batch_size)
     predictor = wm.LogisticRegression(
         144, 1
-    )  # Number of Attention Heads x binary prediction
+    ).cuda()  # Number of Attention Heads x binary prediction
     criterion = nn.BCELoss()
     optimizer = torch.optim.SGD(predictor.parameters(), lr=lr_rate)
     train_loader = torch.utils.data.DataLoader(
@@ -67,7 +67,7 @@ def train(
 
             optimizer.zero_grad()
             outputs = predictor(orig, new, attn)
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels.cuda())
             loss.backward()
             optimizer.step()
 
@@ -114,8 +114,8 @@ def pre_process(input_sentence, target_word):
     inputs = tokenizer.encode_plus(
         input_sentence, return_tensors="pt", add_special_tokens=False
     )
-    token_type_ids = inputs["token_type_ids"]
-    input_ids = inputs["input_ids"]
+    token_type_ids = inputs["token_type_ids"].cuda()
+    input_ids = inputs["input_ids"].cuda()
     embeddings, _, attention = model(input_ids, token_type_ids=token_type_ids)
     input_id_list = input_ids[0].tolist()  # Batch index 0
     tokens = tokenizer.convert_ids_to_tokens(input_id_list)
