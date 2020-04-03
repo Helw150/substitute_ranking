@@ -44,7 +44,7 @@ def train(
         ]
         for new_embeddings in new_embeddings_seq:
             training_data.append(
-                (original_embeddings.cuda(), new_embeddings.cuda(), attention.cuda(), label)
+                (original_embeddings, new_embeddings, attention, label)
             )
 
     epochs = n_iters / (len(training_data) / batch_size)
@@ -60,14 +60,14 @@ def train(
     iter = 0
     for epoch in tqdm(range(int(epochs))):
         for i, (orig, new, attn, labels) in enumerate(train_loader):
-            orig = Variable(orig)
-            new = Variable(new)
-            attn = Variable(attn)
-            labels = Variable(labels.float())
+            orig = Variable(orig).cuda()
+            new = Variable(new).cuda()
+            attn = Variable(attn).cuda()
+            labels = Variable(labels.float()).cuda()
 
             optimizer.zero_grad()
             outputs = predictor(orig, new, attn)
-            loss = criterion(outputs, labels.cuda())
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
