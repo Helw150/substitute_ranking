@@ -5,6 +5,7 @@ from transformers import BertTokenizer, BertModel
 import torch
 from torch.autograd import Variable
 from torch import nn
+from tqdm import tqdm
 
 
 model_version = "bert-base-uncased"
@@ -57,7 +58,7 @@ def train(
     )
 
     iter = 0
-    for epoch in range(int(epochs)):
+    for epoch in tqdm(range(int(epochs))):
         for i, (orig, new, attn, labels) in enumerate(train_loader):
             orig = Variable(orig)
             new = Variable(new)

@@ -2,4 +2,4 @@ pytest
 pytest-cov
 transformers
 torch
-
+tqdm
