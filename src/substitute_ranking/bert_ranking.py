@@ -33,6 +33,8 @@ def train(
         input_sentences, original_words, substitution_words, labels
     ):
         original_embeddings, attention = pre_process(sentence, original_word)
+        original_embeddings = original_embeddings.cpu()
+        attention = attention.cpu()
         new_embeddings_seq = [
             pre_process(
                 re.sub(
@@ -137,7 +139,7 @@ def pre_process(input_sentence, target_word):
         attn[i] = head
     attn = torch.FloatTensor(attn)
     attn = (attn.permute([1, 0]) / attn.sum(1)).permute([1, 0])
-    return util.replace_with_average(embeddings[-1], range_of_target).cpu(), attn.cpu()
+    return util.replace_with_average(embeddings[-1], range_of_target), attn
 
 
 def stats(input_sentence, target_word, attention_needed):
