@@ -6,6 +6,7 @@ import torch
 from torch.autograd import Variable
 from torch import nn
 from tqdm import tqdm
+import gc
 
 
 model_version = "bert-base-uncased"
@@ -14,6 +15,17 @@ model = BertModel.from_pretrained(model_version, output_attentions=True).eval().
 tokenizer = BertTokenizer.from_pretrained(model_version, do_lower_case=do_lower_case)
 cos = nn.CosineSimilarity(dim=0, eps=1e-6)
 
+
+def print_torch_gc():
+    print("GC Check:")
+    sum_cuda = 0
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) and obj.is_cuda:
+                sum_cuda += 1
+        except:
+            pass
+    print(sum_cuda)
 
 def train(
     input_sentences,
@@ -33,6 +45,7 @@ def train(
         input_sentences, original_words, substitution_words, labels
     ):
         original_embeddings, attention = pre_process(sentence, original_word)
+        print_torch_gc()
         original_embeddings = original_embeddings.cpu()
         attention = attention.cpu()
         new_embeddings_seq = [
