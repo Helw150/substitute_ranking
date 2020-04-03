@@ -19,6 +19,7 @@ def train(
     original_words,
     substitution_words,
     labels,
+    eval_function=None,
     batch_size=100,
     n_iters=3000,
     lr_rate=0.001,
@@ -70,6 +71,8 @@ def train(
             optimizer.step()
 
             iter += 1
+            if eval_function != None and iter % 500:
+                eval_function(predictor)
     return predictor
 
 
