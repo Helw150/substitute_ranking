@@ -137,7 +137,7 @@ def pre_process(input_sentence, target_word):
         attn[i] = head
     attn = torch.FloatTensor(attn)
     attn = (attn.permute([1, 0]) / attn.sum(1)).permute([1, 0])
-    return util.replace_with_average(embeddings[-1], range_of_target), attn
+    return util.replace_with_average(embeddings[-1], range_of_target).cpu(), attn.cpu()
 
 
 def stats(input_sentence, target_word, attention_needed):
